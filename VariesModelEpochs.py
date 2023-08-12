@@ -15,7 +15,7 @@ data_folder = r"C:\Users\visantana\Documents\tropical-captcha\Letters"
 MODEL_LABELS_FILENAME = "model_labels.pkl"
 
 # Create an ImageDataGenerator to load and preprocess images from folders
-datagen = ImageDataGenerator(rescale=1.0 / 255.0, validation_split=0.27)
+datagen = ImageDataGenerator(rescale=1.0 / 255.0, validation_split=0.30)
 
 # Load and preprocess training data from the folders
 train_data = datagen.flow_from_directory(

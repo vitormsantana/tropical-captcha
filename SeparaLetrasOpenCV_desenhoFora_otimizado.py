@@ -43,19 +43,22 @@ def main():
             division_positions = [(5, 42), (37, 71), (67, 100), (100, 129), (130, 159), (160, 188)]
             
             divided_images = divide_image(image, division_positions)
-            for version, divided_image in enumerate(divided_images, start=1):
+            for version, divided_image in enumerate(divided_images, start=4):
                 divided_image = cut_top(divided_image, 0.18)
                 divided_image = cut_bottom(divided_image, 0.23)  # Cut 28% from the bottom
                 for letter_position in range(1, 7):
                     divided_image_path = os.path.join(output_folder, f"captcha_{captcha_number}_{version}_{letter_position}.PNG")
+                
                     #cv2.imwrite(divided_image_path, divided_image)
                     print(f"Saved divided image {letter_position} for captcha {captcha_number}, version {version}: {divided_image_path}")
                     
                     # Draw division lines on the divided image
                     image_with_divisions = draw_division_lines(divided_image, [pos[1] for pos in division_positions[:-1]])
                     divided_image_with_lines_path = os.path.join(output_folder, f"captcha_{captcha_number}_{version}_{letter_position}_lines.PNG")
-                    cv2.imwrite(divided_image_with_lines_path, image_with_divisions)
-                    print(f"Saved divided image {letter_position} with lines for captcha {captcha_number}, version {version}: {divided_image_with_lines_path}")
+                    if '_4_lines' in divided_image_with_lines_path:
+                    
+                        cv2.imwrite(divided_image_with_lines_path, image_with_divisions)
+                        print(f"Saved divided image {letter_position} with lines for captcha {captcha_number}, version {version}: {divided_image_with_lines_path}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
