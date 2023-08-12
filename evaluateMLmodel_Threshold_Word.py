@@ -26,6 +26,8 @@ with open(MODEL_LABELS_FILENAME, "rb") as f:
 # Division positions
 division_positions = [(5, 42), (37, 71), (65, 105), (94, 133), (125, 159), (155, 179)]
 
+#oi
+
 # Directory to save images
 output_directory = r"C:\Users\visantana\Documents\tropical-captcha\testSet"
 
