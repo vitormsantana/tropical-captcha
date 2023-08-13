@@ -1,18 +1,34 @@
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+import subprocess
+import os
+import time
+from sagemaker.s3 import S3Uploader
+
+# Install required packages
+#subprocess.call(['pip', 'install', 'keras', 'tensorflow==2.4.1', 'scikit-learn==0.24.2', 'matplotlib==3.4.3'])
+subprocess.call(['pip', 'install', 'keras'])
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras import regularizers
+from tensorflow.keras.layers import Dropout
+
+#from keras.preprocessing.image import ImageDataGenerator
+#from keras.models import Sequential
+#from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 import pickle
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer
-import matplotlib.pyplot as plt
-from keras import regularizers
-from keras.layers import Dropout
+#import matplotlib.pyplot as plt
+#from keras import regularizers
+#from keras.layers import Dropout
 
 # Define the paths to your training data folders
 data_folder = os.environ.get("SM_CHANNEL_TRAINING")  # Access data through environment variable
 
 # Define the paths to your training data folders
-data_folder = r"C:\Users\visantana\Documents\tropical-captcha\Letters"
+#data_folder = r"\root\tropical-captcha\Letters"
 MODEL_LABELS_FILENAME = "model_labels.pkl"
 
 # Create an ImageDataGenerator to load and preprocess images from folders
@@ -50,6 +66,13 @@ lb = LabelBinarizer().fit(class_labels)
 # Save the mapping from labels to one-hot encodings
 with open(MODEL_LABELS_FILENAME, "wb") as f:
     pickle.dump(lb, f)
+    
+# Move the label binarizer file to the shared directory
+#shutil.move(MODEL_LABELS_FILENAME, '/root/model_labels.pkl')
+
+# Upload the label binarizer to S3
+#label_binarizer_s3_path = 's3://sagemaker-us-east-1-050195347459/'
+#S3Uploader.upload('model_labels.pkl', label_binarizer_s3_path)
 
 # Create the neural network model
 model = Sequential()
@@ -75,6 +98,8 @@ model.fit(train_data, validation_data=val_data, epochs=37, verbose=1)
 
 # Save the model weights
 model.save("captcha_model.h5")
+
+model.save('/root/tropical-captcha/paralel_models/paralelized_captcha_model_{current_time}.h5')
 
 # Get the complete training dataset
 X_train = []
