@@ -3,6 +3,8 @@ import numpy as np
 import os
 import pickle
 import cv2
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def cut_bottom(image, cut_percent):
     height = image.shape[0]
@@ -29,7 +31,7 @@ division_positions = [(5, 42), (37, 71), (65, 105), (94, 133), (125, 159), (155,
 output_directory = r"C:\Users\visantana\Documents\tropical-captcha\testSet"
 
 # Load each model from the models directory
-num_models = 4
+num_models = 1
 trained_models = []  # List to store loaded models
 for i in range(num_models):
     
@@ -94,6 +96,44 @@ for i in range(num_models):
             # Save the analyzed cropped image
             cropped_image_output_path = os.path.join(output_directory, f"crop_{image_file[:-10]}_{i+1}_predicted_{predicted_label}.png")
             cv2.imwrite(cropped_image_output_path, divided_image_resized)
+            
+            # Create a heatmap of class probabilities
+            plt.figure(figsize=(8, 6))
+            heatmap = sns.heatmap(ensemble_predictions, annot=True, cmap='YlGnBu', xticklabels=lb.classes_, yticklabels=[predicted_label], fmt='.2f', cbar=False)
+            plt.title(f"Heatmap for Image: {image_file}, Part {i+1}")
+            plt.xlabel("Class")
+            plt.ylabel("Predicted Label")
+            
+            # Save the heatmap as an image
+            heatmap_output_path = os.path.join(output_directory, f"heatmap_{image_file[:-10]}_{i+1}.png")
+            plt.savefig(heatmap_output_path)
+            plt.close()
+        
+            # Find the indices of top and bottom predicted probabilities
+            top_indices = np.argsort(ensemble_predictions[0])[::-1]
+            bottom_indices = np.argsort(ensemble_predictions[0])
+        
+            # Get corresponding class labels
+            top_labels = lb.classes_[top_indices]
+            bottom_labels = lb.classes_[bottom_indices]
+        
+            # Print top and bottom predicted probabilities and labels
+            print(f"Top predicted letters and probabilities: {top_labels[:5]} - {ensemble_predictions[0][top_indices][:5]}")
+            print(f"Bottom predicted letters and probabilities: {bottom_labels[:5]} - {ensemble_predictions[0][bottom_indices][:5]}")
+            
+            # Plot the accuracy distribution per class
+            plt.figure(figsize=(10, 6))
+            sns.barplot(x=lb.classes_, y=ensemble_predictions[0])
+            plt.title(f"Accuracy Distribution for Image: {image_file}, Part {i+1}")
+            plt.xlabel("Class")
+            plt.ylabel("Accuracy")
+            plt.xticks(rotation=45)
+            
+            # Save the accuracy distribution plot as an image
+            accuracy_dist_output_path = os.path.join(output_directory, f"accuracy_dist_{image_file[:-10]}_{i+1}.png")
+            plt.savefig(accuracy_dist_output_path)
+            plt.close()
+            
         
         print(f"Image {image_file} - Predicted Captcha Word: {captcha_word}")
         

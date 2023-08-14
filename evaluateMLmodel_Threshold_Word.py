@@ -16,7 +16,7 @@ def cut_top(image, cut_percent):
 
 # Load the model
 model_path = r"C:\Users\visantana\Documents\tropical-captcha\captcha_model.h5"
-model = load_model(model_path)
+model = load_model(model_path, compile=False)
 
 # Load the label binarizer
 MODEL_LABELS_FILENAME = r"C:\Users\visantana\Documents\tropical-captcha\model_labels.pkl"
@@ -25,6 +25,8 @@ with open(MODEL_LABELS_FILENAME, "rb") as f:
 
 # Division positions
 division_positions = [(5, 42), (37, 71), (65, 105), (94, 133), (125, 159), (155, 179)]
+
+#oi
 
 # Directory to save images
 output_directory = r"C:\Users\visantana\Documents\tropical-captcha\testSet"
@@ -90,4 +92,3 @@ for image_file in image_files:
     cv2.imwrite(pre_crop_image_with_prediction_path, processed_original_image_resized)
     
     print("Process completed.")
-

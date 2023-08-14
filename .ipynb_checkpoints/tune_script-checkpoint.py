@@ -2,6 +2,7 @@ import subprocess
 import os
 import time
 from sagemaker.s3 import S3Uploader
+import json
 
 # Install required packages
 #subprocess.call(['pip', 'install', 'keras', 'tensorflow==2.4.1', 'scikit-learn==0.24.2', 'matplotlib==3.4.3'])
@@ -125,5 +126,20 @@ Y_test = np.array(Y_test)
 
 # Evaluate the model on the test data
 evaluation = model.evaluate(X_test, Y_test)
-print("Test Loss:", evaluation[0])
-print("Test Accuracy:", evaluation[1])
+test_loss = evaluation[0]
+test_accuracy = evaluation[1]
+print("Test Loss:", test_loss)
+print("Test Accuracy:", test_accuracy)
+
+# Get the current timestamp as the model ID
+current_time = int(time.time())
+
+# Save the accuracy value to a JSON file
+accuracy_info = {'model_id': current_time, 'accuracy': test_accuracy}
+accuracy_file_path = f'/root/tropical-captcha/model_accuracy_{current_time}.json'
+with open(accuracy_file_path, 'w') as f:
+    json.dump(accuracy_info, f)
+
+# Upload the accuracy file to S3
+accuracy_s3_path = f's3://sagemaker-us-east-1-050195347459/model_accuracy_{current_time}.json'
+#S3Uploader.upload(accuracy_file_path, accuracy_s3_path)
