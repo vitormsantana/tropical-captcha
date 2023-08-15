@@ -19,7 +19,7 @@ def cut_top(image, cut_percent):
     return image[cut_height:, :]
 
 # Load the model
-model_path = r"C:\Users\visantana\Documents\tropical-captcha\captcha_model.h5"
+model_path = r"C:\Users\visantana\Documents\tropical-captcha\captcha_model_SimpleCNN.h5"
 model = load_model(model_path, compile=False)
 
 # Load the label binarizer

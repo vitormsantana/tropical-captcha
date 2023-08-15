@@ -7,13 +7,15 @@ from sklearn.preprocessing import LabelBinarizer
 import matplotlib.pyplot as plt
 from keras import regularizers
 from keras.layers import Dropout
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
 # Define the paths to your training data folders
 data_folder = r"C:\Users\visantana\Documents\tropical-captcha\Letters"
 MODEL_LABELS_FILENAME = "model_labels.pkl"
 
 # Create an ImageDataGenerator to load and preprocess images from folders
-datagen = ImageDataGenerator(rescale=1.0 / 255.0, validation_split=0.30)
+datagen = ImageDataGenerator(rescale=1.0 / 255.0, validation_split=0.33)
 
 # Load and preprocess training data from the folders
 train_data = datagen.flow_from_directory(
@@ -68,7 +70,7 @@ model.add(Dense(35, activation="softmax"))
 model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
 # Train the neural network
-model.fit(train_data, validation_data=val_data, epochs=37, verbose=1)
+history = model.fit(train_data, validation_data=val_data, epochs=17, verbose=1)
 
 # Save the model weights
 model.save("captcha_model.h5")
@@ -99,3 +101,49 @@ Y_test = np.array(Y_test)
 evaluation = model.evaluate(X_test, Y_test)
 print("Test Loss:", evaluation[0])
 print("Test Accuracy:", evaluation[1])
+
+# Plotting the epoch vs. accuracy and loss
+plt.figure(figsize=(10, 6))
+
+# Plot accuracy
+plt.subplot(2, 1, 1)
+plt.plot(history.history['accuracy'], label='Training Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Epoch vs. Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.grid()
+
+# Plot loss
+plt.subplot(2, 1, 2)
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Epoch vs. Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid()
+
+plt.tight_layout()
+plt.show()
+
+# Sort class labels in alphabetical order
+class_labels.sort()
+
+# Get the predictions and true labels for the validation data
+val_data.reset()  # Reset the generator to the beginning
+Y_pred = model.predict(val_data)
+Y_pred_labels = np.argmax(Y_pred, axis=1)
+Y_true_labels = val_data.classes
+
+# Compute confusion matrix
+conf_matrix = confusion_matrix(Y_true_labels, Y_pred_labels)
+
+# Plot confusion matrix
+plt.figure(figsize=(10, 8))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=class_labels, yticklabels=class_labels)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()

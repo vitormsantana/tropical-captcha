@@ -1,3 +1,9 @@
+from sklearn.metrics import precision_recall_curve
+import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import HalvingGridSearchCV
+from sklearn.metrics import accuracy_score
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
@@ -6,17 +12,31 @@ import numpy as np
 from sklearn.preprocessing import LabelBinarizer
 import matplotlib.pyplot as plt
 from keras import regularizers
+from sklearn.metrics import roc_curve, auc
 from keras.layers import Dropout
-import keras
-import os
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+from keras.models import Model
+from sklearn.inspection import permutation_importance
+from keras.wrappers.scikit_learn import KerasClassifier
+import numpy as np
+from keras.models import Model
+from sklearn.model_selection import train_test_split
+from keras.optimizers import Adam
+from tensorflow.keras.losses import categorical_crossentropy
+import tensorflow as tf
+import numpy as np
+from sklearn.model_selection import GridSearchCV
+from keras.models import Sequential
+from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import HalvingGridSearchCV
 
 # Define the paths to your training data folders
 data_folder = r"C:\Users\visantana\Documents\tropical-captcha\Letters"
-AUGMENTED_IMAGES_DIR = r"C:\Users\visantana\Documents\tropical-captcha\Augmented"
 MODEL_LABELS_FILENAME = "model_labels.pkl"
 
-# Create an ImageDataGenerator with data augmentation
-datagen = ImageDataGenerator(rescale=1.0 / 255.0, validation_split=0.27)
+# Create an ImageDataGenerator to load and preprocess images from folders
+datagen = ImageDataGenerator(rescale=1.0 / 255.0, validation_split=0.30)
 
 # Load and preprocess training data from the folders
 train_data = datagen.flow_from_directory(
@@ -44,37 +64,10 @@ val_data = datagen.flow_from_directory(
 # Convert the class indices to class labels
 class_labels = list(train_data.class_indices.keys())
 
-# Convert the labels (letters) into one-hot encodings that Keras can work with
+# Use the same LabelBinarizer instance for transforming labels
 lb = LabelBinarizer().fit(class_labels)
 
-# Save the mapping from labels to one-hot encodings
-with open(MODEL_LABELS_FILENAME, "wb") as f:
-    pickle.dump(lb, f)
-
-# Create the neural network model
-model = Sequential()
-
-# First convolutional layer with max pooling, L2 regularization, and dropout
-model.add(Conv2D(20, (5, 5), padding="same", input_shape=(31, 26, 1), activation="relu", kernel_regularizer=regularizers.l2(0.01)))
-model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-model.add(Dropout(0.5))  # Adjust dropout rate as needed
-
-# Hidden layer with 500 nodes, L2 regularization, and dropout
-model.add(Flatten())
-model.add(Dense(500, activation="relu", kernel_regularizer=regularizers.l2(0.01)))
-model.add(Dropout(0.5))  # Adjust dropout rate as needed
-
-# Output layer with 35 nodes (one for each possible letter/number we predict)
-model.add(Dense(35, activation="softmax"))
-
-# Ask Keras to build the TensorFlow model behind the scenes
-model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-
-# Train the neural network
-model.fit(train_data, validation_data=val_data, epochs=3, verbose=0)
-
-# Save the model weights
-model.save("captcha_model.h5")
+# ... Rest of your code ...
 
 # Get the complete training dataset
 X_train = []
@@ -99,59 +92,63 @@ X_test = np.array(X_test)
 Y_test = np.array(Y_test)
 
 # Evaluate the model on the test data
-evaluation = model.evaluate(X_test, Y_test)
-print("Test Loss:", evaluation[0])
-print("Test Accuracy:", evaluation[1])
+#evaluation = model.evaluate(X_test, Y_test)
+#@print("Test Loss:", evaluation[0])
+#rint("Test Accuracy:", evaluation[1])
 
-# Track accuracy values
-training_counts = []
-accuracy_values = []
-# Train the neural network for varying numbers of epochs
-models = []  # List to store trained models
+# Predict probabilities for validation data
+#Y_pred_probs = model.predict(X_test)
 
-for num_epochs in range(34, 35):
-    print(f"Training with {num_epochs} epochs...")
-    
-    # Train the model for the specified number of epochs
-    model.fit(train_data, validation_data=val_data, epochs=num_epochs, verbose=0)
-    
-    # Evaluate the model on the validation data
-    evaluation = model.evaluate(X_test, Y_test)
-    accuracy = evaluation[1]
-    
-    # Append the results to the lists
-    training_counts.append(num_epochs)
-    accuracy_values.append(accuracy)
-    
-    print(f"Validation Accuracy after {num_epochs} epochs:", accuracy)
-    
-    # Generate and save augmented images
-    augmented_batch = 0
-    for X_batch, _ in train_data:
-        for i in range(len(X_batch)):
-            augmented_image = X_batch[i] * 255  # Scale back to [0, 255] range
-            augmented_image_path = os.path.join(AUGMENTED_IMAGES_DIR, f"augmented_{num_epochs}_{augmented_batch}_{i}.png")
-            plt.imsave(augmented_image_path, augmented_image.reshape(31, 26), cmap='gray')
-        augmented_batch += 1
-        if augmented_batch >= len(train_data):
-            break
-    
-    # Save the trained model
-    model_folder = r"C:\Users\visantana\Documents\tropical-captcha\models"
-    model_filename = f"trained_model_{num_epochs}_epochs.h5"
-    model.save(os.path.join(model_folder, model_filename))
-    models.append(os.path.join(model_folder, model_filename))
+# Convert predicted probabilities to class labels
+#Y_pred = np.argmax(Y_pred_probs, axis=1)
 
-    models.append(model_filename)
+# Convert one-hot encoded labels back to original labels
+#Y_true_labels = lb.inverse_transform(Y_test)
+#Y_pred_labels = lb.classes_[Y_pred]
 
-# Plot the accuracy
-plt.plot(training_counts, accuracy_values, marker='o')
-plt.xlabel('Number of Epochs')
-plt.ylabel('Validation Accuracy')
-plt.title('Validation Accuracy vs. Number of Epochs')
-plt.grid()
-plt.show()
+# Compute precision and recall values for each class
+precision = dict()
+recall = dict()
+#for i in range(len(class_labels)):
+#    precision[i], recall[i], _ = precision_recall_curve(Y_test[:, i], Y_pred_probs[:, i])
 
-# Load and use the best model
-best_model_filename = models[np.argmax(accuracy_values)]
-best_model = keras.models.load_model(best_model_filename)
+# Define the neural network model as a function
+# Create the neural network model
+def create_model(filters=20, units=500, dropout_rate=0.5):
+    model = Sequential()
+    model.add(Conv2D(filters=filters, kernel_size=(5, 5), padding="same", input_shape=(31, 26, 1), activation="relu", kernel_regularizer=regularizers.l2(0.01)))
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+    model.add(Dropout(dropout_rate))
+    model.add(Flatten())
+    model.add(Dense(units=units, activation="relu", kernel_regularizer=regularizers.l2(0.01)))
+    model.add(Dropout(dropout_rate))
+    model.add(Dense(34, activation="softmax"))  # Here, change 35 to the actual number of classes
+    model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+    return model
+
+# Create a KerasClassifier based on your model-building function
+model = KerasClassifier(build_fn=create_model, verbose=0)
+
+# Define the parameter grid for the successive halving search
+param_grid = {
+    'filters': [20, 32, 64],
+    'units': [250, 500, 750],
+    'dropout_rate': [0.3, 0.5, 0.7]
+}
+
+# Define your custom scoring function
+def custom_scoring(estimator, X, y):
+    y_pred = estimator.predict(X)
+    return accuracy_score(y, y_pred)
+
+# Create your HalvingGridSearchCV
+halving_grid_search = HalvingGridSearchCV(
+    model, param_grid, cv=5, scoring=custom_scoring, factor=2, resource='n_samples'
+)
+
+# Fit the HalvingGridSearchCV
+halving_grid_result = halving_grid_search.fit(X_train, np.argmax(Y_train, axis=1))
+
+# Print the best parameters and the corresponding accuracy
+print("Best parameters found: ", halving_grid_result.best_params_)
+print("Best accuracy found: ", halving_grid_result.best_score_)

@@ -1,8 +1,83 @@
-import subprocess
 import os
+import subprocess
 import time
-from sagemaker.s3 import S3Uploader
 import json
+import argparse
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras import regularizers
+import numpy as np
+from sklearn.preprocessing import LabelBinarizer
+
+# Create an argument parser
+parser = argparse.ArgumentParser(description='Script for training the model with augmentation.')
+
+# Add the expected argument
+parser.add_argument('--augmentation_params', type=str, required=True,
+                    help='JSON-encoded string containing augmentation parameters.')
+parser.add_argument('--batch-size', type=int, default=32,
+                    help='Batch size for training.')
+parser.add_argument('--epochs', type=int, default=37,
+                    help='Number of epochs for training.')
+parser.add_argument('--model_dir', type=str, default='/root/tropical-captcha/paralel_models',
+                    help='Directory where model artifacts will be saved.')
+
+# Parse all the arguments
+args = parser.parse_args()
+
+# Access the batch size, epochs, and model_dir
+batch_size = args.batch_size
+epochs = args.epochs
+model_dir = args.model_dir
+
+# Parse the augmentation_params JSON string
+augmentation_params = json.loads(args.augmentation_params)
+
+# Access the augmentation_params dictionary
+rotation_range = augmentation_params[0]
+width_shift_range = augmentation_params[1]
+height_shift_range = augmentation_params[2]
+horizontal_flip = augmentation_params[3]
+
+# Define the paths to your training data folders
+data_folder = os.environ.get("SM_CHANNEL_TRAINING")  # Access data through environment variable
+MODEL_LABELS_FILENAME = "model_labels.pkl"
+
+# Create an ImageDataGenerator to load and preprocess images from folders
+datagen = ImageDataGenerator(
+    rescale=1.0 / 255.0,
+    rotation_range=rotation_range,
+    width_shift_range=width_shift_range,
+    height_shift_range=height_shift_range,
+    horizontal_flip=horizontal_flip,
+    validation_split=0.30
+)
+
+# Load and preprocess training data from the folders
+train_data = datagen.flow_from_directory(
+    data_folder,
+    target_size=(31, 26),
+    color_mode="grayscale",
+    class_mode="categorical",
+    subset="training",
+    batch_size=args.batch_size,
+    shuffle=True,
+    seed=42
+)
+
+# Load and preprocess validation data from the folders
+val_data = datagen.flow_from_directory(
+    data_folder,
+    target_size=(31, 26),
+    color_mode="grayscale",
+    class_mode="categorical",
+    subset="validation",
+    batch_size=args.batch_size,
+    shuffle=False
+)
 
 # Install required packages
 #subprocess.call(['pip', 'install', 'keras', 'tensorflow==2.4.1', 'scikit-learn==0.24.2', 'matplotlib==3.4.3'])
