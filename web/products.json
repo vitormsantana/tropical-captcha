@@ -1,0 +1,68 @@
+{
+	"items" : [
+		{
+			"sys": {"id" : "1"},
+			"fields":{
+				"title":"Laranja programming mastercourse",
+				"price": 81.99,
+				"image": {"fields":{"file": {"url":"images/laranja.png"}}}
+			}
+		},
+		{
+			"sys": {"id" : "2"},
+			"fields":{
+				"title":"FAANG programming mastercourse",
+				"price": 1111.99,
+				"image": {"fields":{"file": {"url":"images/faang.png"}}}
+		}
+		},
+				{
+			"sys": {"id" : "3"},
+			"fields":{
+				"title":"AA programming mastercourse",
+				"price": 3.99,
+				"image": {"fields":{"file": {"url":"images/aa.png"}}}
+		}
+		},
+				{
+			"sys": {"id" : "4"},
+			"fields":{
+				"title":"ATMos programming mastercourse",
+				"price": 7.99,
+				"image": {"fields":{"file": {"url":"images/amazonia.png"}}}
+		}
+		},
+				{
+			"sys": {"id" : "5"},
+			"fields":{
+				"title":"Estudos programming mastercourse",
+				"price": 55.99,
+				"image": {"fields":{"file": {"url":"images/estudos.png"}}}
+		}
+		},
+				{
+			"sys": {"id" : "6"},
+			"fields":{
+				"title":"Python programming mastercourse",
+				"price": 1389,
+				"image": {"fields":{"file": {"url":"images/python.png"}}}
+		}
+		},
+				{
+			"sys": {"id" : "7"},
+			"fields":{
+				"title":"SAA programming mastercourse",
+				"price": 121.99,
+				"image": {"fields":{"file": {"url":"images/saa.png"}}}
+		}
+		},
+				{
+			"sys": {"id" : "8"},
+			"fields":{
+				"title":"AWS programming mastercourse",
+				"price": 13.99,
+				"image": {"fields":{"file": {"url":"images/aws.png"}}}
+		}
+		}
+	] 
+}
