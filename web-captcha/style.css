@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.captcha-container {
+    margin: 50px auto;
+    max-width: 300px;
+}
+
+#captcha-image {
+    width: 100%;
+    max-height: 200px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+#captcha-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+}
+
+#verify-button {
+    padding: 8px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#result-message {
+    margin-top: 20px;
+    font-weight: bold;
+}

@@ -7,9 +7,10 @@ const closeMenu = document.querySelector(".close-menu")
 const cartItemsTotal = document.querySelector(".noi")
 const cartPriceTotal = document.querySelector(".total-amount")
 const cartUi = document.querySelector(".cart-sidebar .cart")
-const totalDiv = document.querySelector("total-sum")
+const totalDiv = document.querySelector(".total-sum")
 const clearBtn = document.querySelector(".clear-cart-btn")
 const clearContent = document.querySelector(".cart-content")
+const productContainer = document.querySelector('.product-container'); 
 
 let Cart = [];
 let buttonsDOM = [];
@@ -37,81 +38,83 @@ closeMenu.addEventListener("click", function(){
 	menuSidebar.style.transform = "translate(-100%)"
 })
  
-class Product{
-	async getProduct(){
-		const response = await fetch("products.json")
-		const data = await response.json();
-		let products = data.items;
-		products = products.map(item =>{
-			const{title, price} = item.fields;
-			const{id} = item.sys;
-			const image = item.fields.image.fields.file.url;
-			return {title, price, id, image}
-		})
-		return products;
-	}
+class Product {
+    async getProduct() {
+        try {
+            console.log("Fetching products...");
+            const response = await fetch("products.json");
+            console.log("Response:", response);
+            const data = await response.json();
+            console.log("Data:", data);
+            return data.items;
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            return [];
+        }
+    }
 }
 
 
 class UI{
-	displayProducts(products){
-		let result = "";
-		products.forEach(product=>{
-			const productDiv = document.createElement("div")
-			productDiv.innerHTML = '<div class = "product-card">
-									<img src = "${product.image}"alt="product">
-									<span class = "add-to-cart" data-id="${product.id}">
-									<i class = "fa fa-cart--plus fa-1x"
-						style = "margin-right:0.1em; font-size: 1em;"></i>
-						Add to Cart
-						</span>
-						<div class = "product-name">${product.title}</div>
-						<div class = "product-pricing">${product.price}</div>
-						</div>'
-			const p = document.querySelector(".product")
-			p.append(productDiv)
-		})
-	}
-	
-getButtons(){
-	const btns = document.querySelectorAll(".add-to-cart")
-	Array.from(btns)
-	buttonsDOM = btns;
-	btns.forEach(btn)=>{
-		let id = btn.dataset.id
-		let inCart = Cart.find((item)=>item.id===id);
-		if(inCart)
-		{
-			
-			btn.innerHTML = "In Cart"
-			btn.disabled = true
-		}
+    displayProducts(products) {
+		console.log('displayProducts function called');
+		console.log('Products:', products);
+        const productContainer = document.querySelector('.product-container'); // Find the container for displaying products
+		console.log('Product container:', productContainer);
 		
-	btn.addEventListener("click", (e)=>{
-		e.currentTarget.innerHTML = "In Cart"
-		e.currentTarget.style.color = "white"
-		e.currentTarget.style.pointerEvents = "none"
-		let cartItem = {...Storage.getStorageProducts(id), 'amount':1}
-		Cart.push(cartItem)
-		Storage.saveCart(Cart)
-		this.setCartValues(Cart)
-		this.addCartItem(cartItem)
-	})
-	}
-}
-
-}
-
-    setCartValues(cart) {
-        let tempTotal = 0;
-        let itemsTotal = 0;
-        cart.forEach(item => {
-            tempTotal += item.price * item.amount;
-            itemsTotal += item.amount;
+        products.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.innerHTML = `
+                <div class="product-card">
+                    <img src="${product.image}" alt="product">
+                    <span class="add-to-cart" data-id="${product.id}">
+                        <i class="fa fa-cart-plus fa-1x" style="margin-right:0.1em; font-size: 1em;"></i>
+                        Add to Cart
+                    </span>
+                    <div class="product-name">${product.title}</div>
+                    <div class="product-pricing">${product.price}</div>
+                </div>`;
+            productContainer.append(productDiv); // Append the product card to the container
         });
-        cartItemsTotal.innerHTML = itemsTotal;
-        cartPriceTotal.innerHTML = parseFloat(tempTotal.toFixed(2));
+    
     }
+	
+getButtons() {
+    const btns = document.querySelectorAll(".add-to-cart");
+    Array.from(btns).forEach((btn) => {
+        let id = btn.dataset.id;
+        let inCart = Cart.find((item) => item.id === id);
+        if (inCart) {
+            btn.innerHTML = "In Cart";
+            btn.disabled = true;
+        }
+
+        btn.addEventListener("click", (e) => {
+            e.currentTarget.innerHTML = "In Cart";
+            e.currentTarget.style.color = "white";
+            e.currentTarget.style.pointerEvents = "none";
+            let cartItem = { ...Storage.getStorageProducts(id), amount: 1 };
+            Cart.push(cartItem);
+            Storage.saveCart(Cart);
+            this.setCartValues(Cart);
+            this.addCartItem(cartItem);
+        });
+    });
+}
+
+
+
+	setCartValues(cart) {
+		let tempTotal = 0;
+		let itemsTotal = 0;
+		cart.forEach(item => {
+			tempTotal += item.price * item.amount;
+			itemsTotal += item.amount;
+		});
+		cartItemsTotal.innerHTML = itemsTotal;
+		cartPriceTotal.innerHTML = parseFloat(tempTotal.toFixed(2));
+	}
+
 
     addCartItem(cartItem) {
         let cartItemUi = document.createElement("div");
@@ -188,18 +191,6 @@ getButtons(){
                 Cart.map((item) => {
                     if (item.id === id) {
                         item.amount++;
-                        Storage.saveCart(Cart);
-                        this.setCartValues(Cart);
-                        const amountUi = event.currentTarget.parentElement.children[1];
-                        amountUi.innerHTML = item.amount;
-                    }
-                });
-            });
-        });
-    }
-	
-    reduceAmount() {
-        const reduceBtn = document.querySelectorAll(".reduce-ammount"); // Correct class name
         reduceBtn.forEach((btn) => {
             btn.addEventListener("click", (event) => {
                 let id = event.currentTarget.dataset.id;
@@ -264,7 +255,7 @@ class Storage{
 	}
 	
 	static saveCart(Cart){
-		localStorage.setItem('Cart', JSON.sringify(Cart))
+		localStorage.setItem('Cart', JSON.stringify(Cart))
 	}
 	
 	static getCart(){
@@ -285,3 +276,15 @@ document.addEventListener("DOMContentLoaded", () => {
         ui.cartLogic();
     });
 });
+                        Storage.saveCart(Cart);
+                        this.setCartValues(Cart);
+                        const amountUi = event.currentTarget.parentElement.children[1];
+                        amountUi.innerHTML = item.amount;
+                    }
+                });
+            });
+        });
+    }
+	
+    reduceAmount() {
+        const reduceBtn = document.querySelectorAll(".reduce-ammount"); // Correct class name
