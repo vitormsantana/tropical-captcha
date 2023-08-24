@@ -1,43 +1,65 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: gray;
+    min-height: 100vh;
+}
+
+.black-bar {
+    width: 60px; /* Increased width for thicker bars */
+    background-color: black;
+}
+
+.left {
+    height: 100vh;
+}
+
+.right {
+    height: 100vh;
+}
+
+.gray-bar {
+    background-color: gray;
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .captcha-container {
-    text-align: center;
-    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.captcha-container img {
+#captcha-image {
     max-width: 100%;
-    height: auto;
 }
 
-#predict-button {
+button {
     margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
 }
 
 .prediction-box {
-    text-align: center;
-    margin-top: 20px;
-    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-#base64-data {
-    text-align: center;
-    margin-top: 10px;
-    font-style: italic;
+.base64-box {
+    font-family: monospace;
+    white-space: pre-wrap;
+	max-width: 800px;
+    max-height: 200px; /* Limit vertical height */
+    /*overflow-y: auto; /* Add scrollbar if content overflows */
+    width: 80%; /* Increase horizontal width */
 }
 
-#result-container {
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
+.base64-text {
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-width: 100%;
 }
-
