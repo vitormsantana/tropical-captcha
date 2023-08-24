@@ -58,33 +58,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     captchaImage.src = "http://127.0.0.1:8080/processed_p5d3tr.png";
 
     predictButton.addEventListener("click", async () => {
-        try {
-            const base64Captcha = await getBase64FromImage(captchaImage);
-            console.log("Base64 Data:", base64Captcha);
+		try {
+			const base64Captcha = await getBase64FromImage(captchaImage);
 
-        const requestData = {
-            body: {
-                data: `data:image/png;base64,${base64Captcha}`
-            }
-        };
+			const requestData = {
+				body: {
+					data: `data:image/png;base64,${base64Captcha}`
+				}
+			};
 
-            const response = await sendBase64ToAPI(requestData);
+			const response = await sendBase64ToAPI(requestData);
 
-            if (response.ok) {
-                console.log("Base64 data sent successfully.");
-                const responseBody = await response.json();
-                console.log("API Response Body:", responseBody);
+			if (response.ok) {
+				console.log("Base64 data sent successfully.");
+				const responseBody = await response.json();
+				console.log("API Response Body:", responseBody);
 
-                resultContainer.textContent = "Prediction: " + responseBody.body.prediction;
+				const bodyJSON = JSON.parse(responseBody.body);
+				const prediction = bodyJSON.prediction;
 
-                // Display base64
-                base64Display.textContent = "Base64 Data:\n" + divideString(base64Captcha, 120);
-            } else {
-                console.error("Error sending base64 data.");
-            }
-        } catch (error) {
-            console.error("An error occurred:", error);
-            resultContainer.textContent = "Error: Failed to predict";
-        }
-    });
+				resultContainer.textContent = "Prediction: " + prediction;
+
+				// Display base64
+				base64Display.textContent = "Base64 Data:\n" + divideString(base64Captcha, 120);
+			} else {
+				console.error("Error sending base64 data.");
+			}
+		} catch (error) {
+			console.error("An error occurred:", error);
+			resultContainer.textContent = "Error: Failed to predict";
+		}
+	});
 });

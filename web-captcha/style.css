@@ -9,7 +9,7 @@ body {
 }
 
 .black-bar {
-    width: 60px; /* Increased width for thicker bars */
+    width: 160px;
     background-color: black;
 }
 
