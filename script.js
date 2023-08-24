@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const predictButton = document.getElementById("predict-button");
     const resultContainer = document.getElementById("result-container");
 
-    captchaImage.src = "http://localhost:8000/processed_p5d3tr.PNG"; // Set your image source
+    captchaImage.src = "https://vitormsantana.github.io/tropical-captcha/processed_p5d3tr.PNG";
+
 
     predictButton.addEventListener("click", async () => {
         try {
