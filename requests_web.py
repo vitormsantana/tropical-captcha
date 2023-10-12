@@ -1,7 +1,7 @@
 import os
 import requests
 
-def download_captcha(url, n=1, path=".", secure=False, ext=".jpeg"):
+def download_captcha(url, n=1, path=".", secure=False, ext=".png"):
     # Modify the path to the desired folder
     path = os.path.join(path, "labeled_testSet")
     os.makedirs(path, exist_ok=True)
@@ -29,21 +29,27 @@ def download_captcha_(url, path, secure, ext, index):
     # Send GET request
     r = requests.get(url, verify=secure)
 
-    # Get file extension
-    ct = r.headers.get("content-type")
-    ext = ext if ct is None else "." + ct.split("/")[-1]
+    # Check if the request was successful (status code 200)
+    if r.status_code != 200:
+        print(f"Failed to download captcha from {url}. Status code: {r.status_code}")
+        return None
 
-    # Save captcha to disk with unique file name
+    # Save captcha to disk with a unique file name
     file_name = f"captcha_{index:03d}{ext}"
     file_path = os.path.join(path, file_name)
-    with open(file_path, "wb") as f:
-        f.write(r.content)
+    
+    try:
+        # Use 'wb' mode to write in binary mode
+        with open(file_path, "wb") as f:
+            f.write(r.content)
+        print(f"Downloaded captcha {index + 1} from {url}")
+        return file_path
+    except Exception as e:
+        print(f"Error saving captcha {index + 1} from {url}: {str(e)}")
+        return None
 
-    return file_path
-
-# Example usage: Download 500 captchas from RFB
-num_captchas = 200
+# Example usage: Download 1 captcha from RFB in PNG format
+num_captchas = 1
 file_paths = download_captcha("rfb", n=num_captchas, path="C:/Users/visantana/Documents/tropical-captcha")
 print(f"Downloaded {num_captchas} files:", file_paths)
-
 

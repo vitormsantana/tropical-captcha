@@ -8,9 +8,24 @@ body {
     min-height: 100vh;
 }
 
+.title-container {
+    margin-top: -310px;
+    margin-left: 272px;
+    width: 800px;
+    font-size: 36px;
+    font-style: italic;
+    font-family: fantasy;
+    color: white;
+}
+
 .black-bar {
     width: 160px;
-    background-color: black;
+    background: linear-gradient(to right, black, grey);
+}
+
+.black-bar2 {
+    width: 160px;
+    background: linear-gradient(to left, black, grey);
 }
 
 .left {
@@ -34,7 +49,18 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    background-color: white;
+    border: 5px solid black;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 252px;
+    text-align: center;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #captcha-image {
@@ -45,21 +71,37 @@ button {
     margin-top: 10px;
 }
 
-.prediction-box {
-    margin-bottom: 20px;
-}
-
 .base64-box {
     font-family: monospace;
     white-space: pre-wrap;
-	max-width: 800px;
-    max-height: 200px; /* Limit vertical height */
-    /*overflow-y: auto; /* Add scrollbar if content overflows */
-    width: 80%; /* Increase horizontal width */
+    max-width: 800px;
+    max-height: 200px;
+    width: 80%;
 }
 
 .base64-text {
     white-space: pre-wrap;
     word-break: break-all;
     max-width: 100%;
+    color: white;
+}
+
+.prediction-box {
+    color: white;
+    font-size: 40px;
+    margin-top: 10px;
+    margin-left: 1px;
+    margin-bottom: 20px;
+    font-style: oblique;
+    font-family: fantasy;
+}
+
+.prediction-result {
+    color: white;
+    font-size: 40px;
+    margin-top: 100px;
+    margin-left: -500px;
+    margin-bottom: 20px;
+    font-style: oblique;
+    font-family: fantasy;
 }

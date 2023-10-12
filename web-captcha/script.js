@@ -48,16 +48,51 @@ async function sendBase64ToAPI(jsonData) {
     }
 }
 
-// DOMContentLoaded event handler
+//function to randomly select an image to predict
+function getRandomImageName() {
+    const imageNames = [
+        "captcha_0",
+		"captcha_1",
+		"captcha_2",
+		"captcha_4",
+		"captcha_5",
+		"captcha_6",
+		"captcha_7",
+		"captcha_8",
+		"captcha_9",
+		"captcha_10",
+		"captcha_11"
+        /*"processed_captcha_002.png",
+        "processed_captcha_003.png",
+		"processed_captcha_004.png",
+        "processed_captcha_005.png",
+        "processed_captcha_006.png",
+		"processed_captcha_007.png",
+        "processed_captcha_008.png",
+        "processed_captcha_009.png",
+		"processed_captcha_010.png",
+        "processed_captcha_011.png",
+        "processed_captcha_012.png",
+		"processed_captcha_013.png",
+        "processed_captcha_014.png",
+        "processed_captcha_015.png",
+		*/
+        // Add more image names as needed
+    ];
+
+    const randomIndex = Math.floor(Math.random() * imageNames.length);
+    return imageNames[randomIndex];
+}
+
+
 document.addEventListener("DOMContentLoaded", async () => {
     const captchaImage = document.getElementById("captcha-image");
     const predictButton = document.getElementById("predict-button");
+    const nextButton = document.getElementById("next-button"); // Add this line
     const resultContainer = document.getElementById("prediction-result");
     const base64Display = document.getElementById("base64-data");
 
-    captchaImage.src = "http://127.0.0.1:8080/processed_p5d3tr.png";
-
-    predictButton.addEventListener("click", async () => {
+	predictButton.addEventListener("click", async () => {
 		try {
 			const base64Captcha = await getBase64FromImage(captchaImage);
 
@@ -77,10 +112,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 				const bodyJSON = JSON.parse(responseBody.body);
 				const prediction = bodyJSON.prediction;
 
-				resultContainer.textContent = "Prediction: " + prediction;
+				// Set the prediction text within the styled container
+				resultContainer.textContent = prediction;
+				resultContainer.style.display = "block"; // Make the container visible
 
 				// Display base64
-				base64Display.textContent = "Base64 Data:\n" + divideString(base64Captcha, 120);
+				//base64Display.textContent = "Base64 Data:\n" + divideString(base64Captcha, 120);
 			} else {
 				console.error("Error sending base64 data.");
 			}
@@ -88,5 +125,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 			console.error("An error occurred:", error);
 			resultContainer.textContent = "Error: Failed to predict";
 		}
-	});
 });
+
+    nextButton.addEventListener("click", async () => {
+        try {
+            const randomImageName = getRandomImageName();
+            const imageSrc = `./${randomImageName}.png`;
+
+            captchaImage.src = imageSrc;
+
+            resultContainer.textContent = "Prediction: "; // Clear the prediction
+            //base64Display.textContent = "Base64 Data:\n-"; // Clear the base64 data
+        } catch (error) {
+            console.error("An error occurred:", error);
+        }
+    });
+});
+

@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Captcha Solver</title>
+    <title>Tropical Captcha</title> 
 </head>
 <body>
-    <div class="black-bar left"></div>
+	<div class="title-container">
+        <h1>Tropical Captcha</h1>
+    </div>
+
     <div class="gray-bar">
         <div class="captcha-container">
-            <img id="captcha-image" src="http://127.0.0.1:8080/processed_p5d3tr.png" alt="Captcha Image">
-            <button id="predict-button">Predict</button>
-        </div>
-        <div id="prediction-result" class="prediction-box"></div>
-        <div id="base64-data" class="base64-box">-</div>
-        <div id="base64-text" class="base64-text"></div> <!-- Add this line -->
+		<img id="captcha-image" src="http://10.30.6.63:8081/captcha_0.png" alt="Captcha Image">
+		<button id="predict-button">Predict</button>
+		<button id="next-button">Next</button> 
+	</div>
+        <div id="prediction-result" class="prediction-result"></div>
+        <div id="base64-text" class="base64-text"></div>
+		<div id="prediction-container" class="prediction-box"></div>		
     </div>
-    <div class="black-bar right"></div>
 
     <script src="script.js"></script>
 </body>
